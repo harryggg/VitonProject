@@ -3,6 +3,7 @@ package com.example.fengling.vitontest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -26,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.logging.Filter;
 
 public class MyService extends Service implements
         SensorEventListener{
@@ -50,12 +52,14 @@ public class MyService extends Service implements
     //define sensors
     private static SensorManager mSensorManager;
     private static Sensor mHeartRateSensor;
+    private static Sensor countSensor;
     public static float hpm = 0.0f;
     public long startTime = SystemClock.elapsedRealtime();
     public long hpmUpdateTime = SystemClock.elapsedRealtime();
+    public long stepUpdateTime = SystemClock.elapsedRealtime();
     public long motionUpdateTime = SystemClock.elapsedRealtime();
     public long previousTime = SystemClock.elapsedRealtime();
-
+    public static float previousStep = 0;
 
     //used for getting the handler from other class for sending messages
     public static Handler 		mMyServiceHandler 			= null;
@@ -74,44 +78,52 @@ public class MyService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        startTime = SystemClock.elapsedRealtime();
-        hpmUpdateTime = SystemClock.elapsedRealtime();
-        motionUpdateTime = SystemClock.elapsedRealtime();
-        previousTime = SystemClock.elapsedRealtime();
+        if (intent.getAction()=="TERMINATION"){
+            Log.i(TAG,"TERMINATION");
+            stopSelf();
+        }else {
+            startTime = SystemClock.elapsedRealtime();
+            hpmUpdateTime = SystemClock.elapsedRealtime();
+            motionUpdateTime = SystemClock.elapsedRealtime();
+            stepUpdateTime = SystemClock.elapsedRealtime();
+            previousTime = SystemClock.elapsedRealtime();
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+            wl.acquire();
 
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
-        wl.acquire();
+            //start sensor service
+            mSensorManager = ((SensorManager) this.getSystemService(SENSOR_SERVICE));
+            //get heart rate sensors
+            mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+            countSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+            if (countSensor != null) {
+                mSensorManager.registerListener(this, countSensor, SensorManager.SENSOR_DELAY_UI);
+            } else {
+                Toast.makeText(this, "Count sensor not available!", Toast.LENGTH_LONG).show();
+            }
+            //mHeartRateSensor = mSensorManager.getDefaultSensor(65562);  //only for Gear Live
 
-        //start sensor service
-        mSensorManager = ((SensorManager)this.getSystemService(SENSOR_SERVICE));
-        //get heart rate sensors
-        mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-        //mHeartRateSensor = mSensorManager.getDefaultSensor(65562);  //only for Gear Live
+            //start sensors
+            mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        //start sensors
-        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            MyThread myThread = new MyThread();
+            myThread.start();
 
-        MyThread myThread = new MyThread();
-        myThread.start();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        try
-        {
-            Thread.sleep(200);
+            mIsServiceRunning = true; // set service running status = true
+
+
+            //Log.e("check sensor",String.valueOf(mHeartRateSensor));
+
+            Toast.makeText(this, "Congrats! My Service Started", Toast.LENGTH_LONG).show();
+            // We need to return if we want to handle this service explicitly.
+            //return START_STICKY;
         }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        mIsServiceRunning = true; // set service running status = true
-
-
-        //Log.e("check sensor",String.valueOf(mHeartRateSensor));
-
-        Toast.makeText(this, "Congrats! My Service Started", Toast.LENGTH_LONG).show();
-        // We need to return if we want to handle this service explicitly.
-        //return START_STICKY;
         return START_REDELIVER_INTENT;
     }
 
@@ -120,9 +132,9 @@ public class MyService extends Service implements
         if (mSensorManager != null) {
             mSensorManager.unregisterListener(this);
         }
-
-        wl.release();
-
+        if (wl != null) {
+            wl.release();
+        }
         Toast.makeText(this, "MyService Stopped", Toast.LENGTH_LONG).show();
         Log.i(TAG, "onDestroy");
 
@@ -191,13 +203,36 @@ public class MyService extends Service implements
     @Override
     public void onAccuracyChanged(Sensor arg0, int arg1) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         //Update your data. This check is very raw. You should improve it when the sensor is unable to calculate the heart rate
         switch(event.sensor.getType()) {
+            case Sensor.TYPE_STEP_COUNTER:
+
+                Log.i(TAG,"step detected,previous"+(previousStep));
+                Log.i(TAG,"value[0]:"+event.values[0]);
+                if (SystemClock.elapsedRealtime() - stepUpdateTime < 1000*10) break;
+                stepUpdateTime = SystemClock.elapsedRealtime();
+                float temp = previousStep;
+                previousStep = event.values[0];
+                Log.i(TAG,""+previousStep);
+                Toast.makeText(this, "step: "+event.values[0], Toast.LENGTH_LONG).show();
+                if (event.values[0]-temp>100){
+                    if (temp==0){
+                        Log.i(TAG,"Just initialized");
+                        break;
+                    }
+                    //start power save mode
+                    Log.i(TAG,"running");
+                    Context context = this.getApplicationContext();
+                    context.startService(new Intent(context,PowerSavingService.class));
+                    stopSelf();
+
+                }
+                break;
+
             case Sensor.TYPE_HEART_RATE:
             //case 65562: //only for Gear Live
                 if (SystemClock.elapsedRealtime() - hpmUpdateTime < 950 || event.values[0] <= - 10.0) break;
@@ -338,7 +373,8 @@ public class MyService extends Service implements
         try {
             out = new BufferedOutputStream(new FileOutputStream(file));
             for (int i=0;i<tempBufferHPM.size();i++){
-                out.write((String.valueOf(sdf.format(tempBufferTime.get(i))) + " " + String.valueOf(tempBufferHPM.get(i))).getBytes());                out.write("\n".getBytes());
+                out.write((String.valueOf(sdf.format(tempBufferTime.get(i))) + " " + String.valueOf(tempBufferHPM.get(i))).getBytes());
+                out.write("\n".getBytes());
             }
             Log.i(TAG,"file "+filename +" is written");
             out.flush();

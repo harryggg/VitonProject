@@ -1,16 +1,25 @@
 package com.example.fengling.vitontest;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.wearable.view.WatchViewStub;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.util.Calendar;
 
 //import java.util.logging.Handler;
 
@@ -31,6 +40,7 @@ public class MyActivity extends Activity {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 mTextView = (TextView) stub.findViewById(R.id.text);
+
             }
         });
 
@@ -54,7 +64,37 @@ public class MyActivity extends Activity {
             }
         };
     }
+    public void onClickSetAlarm(View v){
+        Context context = this.getApplicationContext();
+        AlarmManager alarmMgr2 = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
+        Class myService1 = null;
+
+        try {
+            myService1 = Class.forName("com.example.fengling.vitontest.MyService");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Intent myIntent2 = new Intent(context, myService1);
+        //myIntent2.setAction("TERMINATION");
+
+
+            PendingIntent alarmIntent2 = PendingIntent.getService(context, 0, myIntent2, 0);
+       /* Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTimeInMillis(System.currentTimeMillis());
+        calendar1.set(Calendar.HOUR_OF_DAY, 14);
+        calendar1.set(Calendar.MINUTE,33);
+// With setInexactRepeating(), you have to use one of the AlarmManager interval
+// constants--in this case, AlarmManager.INTERVAL_DAY.
+
+        alarmMgr2.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar1.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent2);
+                */
+        alarmMgr2.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() +
+                        10 * 1000, alarmIntent2);
+    }
 
 
     //send sensor data to phone
@@ -103,6 +143,7 @@ public class MyActivity extends Activity {
     public void onClickStartService(View V)
     {
         //start the service from here //MyService is your service class name
+        putNotification();
         startService(new Intent(this, MyService.class));
     }
     //Stop the started service
@@ -130,5 +171,30 @@ public class MyActivity extends Activity {
             MyService.mMyServiceHandler.sendMessage(msg);
         }
 
+    }
+    public void putNotification(){
+        Log.i(TAG, "notify");
+        int notificationId = 001;
+// Build intent for notification content
+        Intent viewIntent = new Intent(this, MyActivity.class);
+
+        PendingIntent viewPendingIntent =
+                PendingIntent.getActivity(this, 0, viewIntent, 0);
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("testtitle")
+                        .setContentText("hello")
+                        .setContentIntent(viewPendingIntent)
+                        .addAction(R.drawable.ic_full_cancel,
+                                getString(R.string.app_name), viewPendingIntent);;
+
+// Get an instance of the NotificationManager service
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(this);
+
+// Build the notification and issues it with notification manager.
+        notificationManager.notify(notificationId, notificationBuilder.build());
     }
 }

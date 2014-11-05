@@ -1,6 +1,9 @@
 package com.example.fengling.vitontest;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -17,6 +20,10 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MyActivity extends Activity implements
@@ -29,6 +36,7 @@ public class MyActivity extends Activity implements
     private static final String START_ACTIVITY_PATH_GETDATA = "/viton/getData";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
@@ -54,13 +62,30 @@ public class MyActivity extends Activity implements
                 .addApi(Wearable.API)
                 .build();
         //start connection
+
         mGoogleApiClient.connect();
+        Log.i(TAG,""+mGoogleApiClient.isConnecting());
         //sendMessageToStartActivity();
     }
 
 
 
     public void sendMessageToStartService(View v) {
+        Log.i(TAG,"fileTransfer");
+        Context context = this.getApplicationContext();
+        Class myService = null;
+
+        try {
+            myService = Class.forName("com.example.fengling.vitontest.DataTransferService");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Intent myIntent1 = new Intent(context, myService);
+        context.startService(myIntent1);
+
+
+        /*
         if (mGoogleApiClient.isConnected()){
             Log.i(TAG,"connected");
 
@@ -85,9 +110,25 @@ public class MyActivity extends Activity implements
             Log.e(TAG, "not connected");
         }
         //saveFile();
+        // */
+
     }
 
     public void sendMessageToStopService(View v) {
+        Context context = this.getApplicationContext();
+        Class myService = null;
+
+        try {
+            myService = Class.forName("com.example.fengling.vitontest.DataTransferService");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Intent myIntent = new Intent(context, myService);
+        myIntent.setAction("TERMINATION");
+        context.startService(myIntent);
+
+        /*
         if (mGoogleApiClient.isConnected()){
             Log.i(TAG,"connected");
 
@@ -112,6 +153,7 @@ public class MyActivity extends Activity implements
             Log.e(TAG, "not connected");
         }
         //saveFile();
+        */
     }
 
     public void sendMessageToGetDataFromWatch(View v) {

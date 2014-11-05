@@ -54,7 +54,7 @@ public class phoneWearableListenerService extends WearableListenerService {
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-
+        Log.i(TAG,"datachange");
         for (DataEvent event : dataEvents) {
             DataMapItem mapItem = DataMapItem.fromDataItem(event.getDataItem());
             String path = event.getDataItem().getUri().getPath();
@@ -86,10 +86,10 @@ public class phoneWearableListenerService extends WearableListenerService {
         SimpleDateFormat sdf = new SimpleDateFormat("HH-mm-ss");
         String filename = sdf.format(new Date());
 
-
-        File folder = new File((Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/viton/" + fDate));
+        //Log.i(TAG,Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/viton/" + fDate);
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/viton/" + fDate);
         if (!folder.exists()){
-            folder.mkdir();
+            folder.mkdirs();
             Log.i(TAG,"folder is in place");
         }else {
             Log.i(TAG,"folder is already there");
@@ -173,7 +173,7 @@ public class phoneWearableListenerService extends WearableListenerService {
     public void sendData(String username, List<String> dataList) {
 
         try {
-
+            Log.i(TAG,"fileUploading");
             Authenticator.setDefault(new BasicAuthenticator());
             URL url = new URL("http://app.vitonhealth.com/users/" + username
                     + "/indexes");
