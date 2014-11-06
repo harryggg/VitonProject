@@ -183,7 +183,9 @@ public class MyActivity extends Activity implements
         //saveFile();
     }
 
-
+    public void startBLE(View v){
+        startActivity(new Intent(this,DeviceScanActivity.class));
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

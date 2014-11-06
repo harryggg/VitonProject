@@ -17,7 +17,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Measuring"
+        android:text="Start Android Wear Measuring"
         android:id="@+id/start_Measurement"
         android:onClick="sendMessageToStartService"
         android:layout_below="@+id/textView"
@@ -45,5 +45,15 @@
         android:layout_toEndOf="@+id/textView"
         android:layout_centerVertical="true"
         android:layout_alignStart="@+id/start_Measurement" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BLE Measuring"
+        android:id="@+id/Start_BLE"
+        android:onClick="startBLE"
+        android:layout_below="@+id/textView"
+        android:layout_alignStart="@+id/start_Measurement"
+        android:layout_marginTop="47dp" />
 
 </RelativeLayout>

@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
     <!-- Declare the permission for body sensor -->
     <uses-permission android:name="android.permission.BODY_SENSORS" />
 
@@ -57,6 +62,18 @@
         </service>
         <service
             android:name=".DataTransferService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <activity
+            android:name=".DeviceControlActivity"
+            android:label="@string/title_activity_blescan" >
+        </activity>
+        <activity android:name=".DeviceScanActivity"
+            android:label="@string/app_name" />
+        <service
+            android:name=".BluetoothLeService"
             android:enabled="true"
             android:exported="true" >
         </service>
