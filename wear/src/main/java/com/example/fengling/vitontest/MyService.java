@@ -96,11 +96,12 @@ public class MyService extends Service implements
             //get heart rate sensors
             mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             countSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+           /*
             if (countSensor != null) {
                 mSensorManager.registerListener(this, countSensor, SensorManager.SENSOR_DELAY_UI);
             } else {
                 Toast.makeText(this, "Count sensor not available!", Toast.LENGTH_LONG).show();
-            }
+            }*/
             //mHeartRateSensor = mSensorManager.getDefaultSensor(65562);  //only for Gear Live
 
             //start sensors
@@ -208,7 +209,7 @@ public class MyService extends Service implements
     @Override
     public void onSensorChanged(SensorEvent event) {
         //Update your data. This check is very raw. You should improve it when the sensor is unable to calculate the heart rate
-        switch(event.sensor.getType()) {
+        switch(event.sensor.getType()) {/*
             case Sensor.TYPE_STEP_COUNTER:
 
                 Log.i(TAG,"step detected,previous"+(previousStep));
@@ -232,7 +233,7 @@ public class MyService extends Service implements
 
                 }
                 break;
-
+            */
             case Sensor.TYPE_HEART_RATE:
             //case 65562: //only for Gear Live
                 if (SystemClock.elapsedRealtime() - hpmUpdateTime < 950 || event.values[0] <= - 10.0) break;
@@ -355,7 +356,7 @@ public class MyService extends Service implements
         //String fDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         String filename = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyyy-MM-dd,hh:mm:ss");
+        sdf = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
 
         File folder = new File((getFilesDir().getAbsoluteFile() + "/rawData/"));
         if (!folder.exists()){
