@@ -1,7 +1,6 @@
 package com.example.fengling.vitontest;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,10 +19,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 
 public class MyActivity extends Activity implements
@@ -31,9 +27,7 @@ public class MyActivity extends Activity implements
 
     private final String TAG = "phone main";
     private GoogleApiClient mGoogleApiClient;
-    private static final String START_ACTIVITY_PATH_START = "/viton/start";
-    private static final String START_ACTIVITY_PATH_STOP = "/viton/stop";
-    private static final String START_ACTIVITY_PATH_GETDATA = "/viton/getData";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -75,85 +69,22 @@ public class MyActivity extends Activity implements
         Context context = this.getApplicationContext();
         Class myService = null;
 
-        try {
-            myService = Class.forName("com.example.fengling.vitontest.DataTransferService");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        Intent myIntent1 = new Intent(context, myService);
+
+        Intent myIntent1 = new Intent(context, DataTransferService.class);
         context.startService(myIntent1);
 
 
-        /*
-        if (mGoogleApiClient.isConnected()){
-            Log.i(TAG,"connected");
 
-            new Thread (new Runnable() {
-                @Override
-                public void run() {
-                    //Toast.makeText(this, "test", Toast.LENGTH_LONG).show();
-                    NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-
-                    for (final Node node : nodes.getNodes()){
-                        Log.i(TAG, "Node: " + node.getId());
-                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), START_ACTIVITY_PATH_START, "Stop data measurement".getBytes()).await();
-                        if (!result.getStatus().isSuccess()){
-                            Log.e(TAG,"msg not sent");
-                        } else {
-                            Log.i(TAG,"msg sent");
-                        }
-                    }
-                }
-            }).start();
-        }else {
-            Log.e(TAG, "not connected");
-        }
-        //saveFile();
-        // */
 
     }
 
     public void sendMessageToStopService(View v) {
         Context context = this.getApplicationContext();
-        Class myService = null;
 
-        try {
-            myService = Class.forName("com.example.fengling.vitontest.DataTransferService");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        Intent myIntent = new Intent(context, myService);
+        Intent myIntent = new Intent(context, DataTransferService.class);
         myIntent.setAction("TERMINATION");
         context.startService(myIntent);
-
-        /*
-        if (mGoogleApiClient.isConnected()){
-            Log.i(TAG,"connected");
-
-            new Thread (new Runnable() {
-                @Override
-                public void run() {
-                    NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-
-                    for (final Node node : nodes.getNodes()){
-                        Log.i(TAG, "Node: " + node.getId());
-                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), START_ACTIVITY_PATH_STOP, "Stop data measurement".getBytes()).await();
-                        if (!result.getStatus().isSuccess()){
-                            Log.e(TAG,"msg not sent");
-                            Toast.makeText(getParent(), "test", Toast.LENGTH_LONG).show();
-                        } else {
-                            Log.i(TAG,"msg sent");
-                        }
-                    }
-                }
-            }).start();
-        }else {
-            Log.e(TAG, "not connected");
-        }
-        //saveFile();
-        */
     }
 
     public void sendMessageToGetDataFromWatch(View v) {
@@ -167,7 +98,7 @@ public class MyActivity extends Activity implements
 
                     for (final Node node : nodes.getNodes()){
                         Log.i(TAG, "Node: " + node.getId());
-                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), START_ACTIVITY_PATH_GETDATA, "Retrieve measurement".getBytes()).await();
+                        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), Flags.START_ACTIVITY_PATH_GETDATA, "Retrieve measurement".getBytes()).await();
                         if (!result.getStatus().isSuccess()){
                             Log.e(TAG,"msg not sent");
                             Toast.makeText(getParent(), "test", Toast.LENGTH_LONG).show();

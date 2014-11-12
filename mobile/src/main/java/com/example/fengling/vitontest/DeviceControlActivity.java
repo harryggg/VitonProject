@@ -81,6 +81,7 @@ public class DeviceControlActivity extends Activity {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
+
                 updateConnectionState(R.string.connected);
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
@@ -109,6 +110,7 @@ public class DeviceControlActivity extends Activity {
                     if (mGattCharacteristics != null) {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
+                        Log.i(TAG,characteristic.toString());
                         final int charaProp = characteristic.getProperties();
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             // If there is an active notification on a characteristic, clear

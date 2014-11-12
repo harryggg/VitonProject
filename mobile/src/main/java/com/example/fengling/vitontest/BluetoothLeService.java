@@ -12,12 +12,19 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -60,6 +67,8 @@ public class BluetoothLeService extends Service {
 
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
+
+    public long UpdateTime = SystemClock.elapsedRealtime();
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -321,8 +330,10 @@ public class BluetoothLeService extends Service {
 
     private void emitHeartBeatData(int heartRate) {
 
-        if(heartBeats.size() > 30) {
+        if(SystemClock.elapsedRealtime()-UpdateTime>Flags.UPDATEINTERVAL) {
+            UpdateTime = SystemClock.elapsedRealtime();
             sendData(TEST_USER, new ArrayList<String>(heartBeats));
+            saveFile(new ArrayList<String>(heartBeats));
             heartBeats.clear();
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd,hh:mm:ss");
@@ -375,7 +386,55 @@ public class BluetoothLeService extends Service {
         }
 
     }
+    private void saveFile(ArrayList<String> dataFromWatch) {
+        //write to file
+        Log.i(TAG,"SAVEFILE");
+        Date cDate = new Date();
+        String fDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
+        SimpleDateFormat sdf = new SimpleDateFormat("H-mm-ss");
+        String filename = sdf.format(new Date());
 
+        //Log.i(TAG,Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/viton/" + fDate);
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/vitonBLE/" + fDate);
+        if (!folder.exists()){
+            folder.mkdirs();
+            Log.i(TAG,"folder is in place");
+        }else {
+            Log.i(TAG,"folder is already there");
+        }
+
+        if (!folder.exists()){
+            Log.e(TAG,"folder is not created");
+            return;
+        }
+
+        File file = new File(folder+"/"+filename+".csv");
+        OutputStream out = null;
+        Log.i(TAG,"output file is "+file.getAbsoluteFile());
+
+        try {
+            out = new BufferedOutputStream(new FileOutputStream(file));
+            for (int i=0;i<dataFromWatch.size();i++){
+                out.write(String.valueOf(dataFromWatch.get(i)).getBytes());
+                out.write("\n".getBytes());
+            }
+            Log.i(TAG,"file is written");
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //String path3 = getFilesDir().getAbsolutePath() + "/"+file.getName();
+        //File f3 = new File(path3);
+        //file.setReadable(true,false);
+
+        //copy the file to public directory
+        //String sourcePath = getFilesDir().getAbsolutePath();
+        //String destinationPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        //copyFile(String.valueOf(sourcePath),"/test.txt",String.valueOf(destinationPath));
+    }
     static class BasicAuthenticator extends Authenticator {
         public PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication("admin@viton.com",

@@ -37,8 +37,6 @@ public class MyService extends Service implements
     private static final long updateInterval = 6000;        //interval for sending data to phone
     private static final long restartInterval = 20000;       //if after this duration no update in hpm, restart sensor.
     private static final String TAG = "MyService";
-    private static final String START_ACTIVITY_PATH = "/viton/start";
-    private static final String BUFFERDATA_PATH = "/viton/bufferData";
     private  Collection<String> nodes;
     private  int countHeartBeat = 0;
     private ArrayList<String> bufferData = new ArrayList<String>();         //buffer data to be sent to phone

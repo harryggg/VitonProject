@@ -34,16 +34,14 @@ import java.util.List;
 public class phoneWearableListenerService extends WearableListenerService {
 
     private static final String TAG = "phone service";
-    private static final String START_ACTIVITY_PATH = "/viton/start";
-    private static final String BUFFERDATA_PATH = "/viton/bufferData";
+
     private static int countHeartBeat = 0;
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.i("TAG", "msg received");
         Log.i("TAG", String.valueOf(messageEvent.getPath()));
-        //Toast.makeText(this, "msg received", Toast.LENGTH_LONG).show();
-        if (START_ACTIVITY_PATH.equals(messageEvent.getPath())) {
+        if (Flags.START_ACTIVITY_PATH_START.equals(messageEvent.getPath())) {
 
             Log.i(TAG, "received");
         } else {
@@ -60,18 +58,18 @@ public class phoneWearableListenerService extends WearableListenerService {
             String path = event.getDataItem().getUri().getPath();
 
             DataItem dataItem = event.getDataItem();
-            if (BUFFERDATA_PATH.equals(dataItem.getUri().getPath())) {
+            if (Flags.BUFFERDATA_PATH.equals(dataItem.getUri().getPath())) {
                 DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
                 //show the number of data received
-                countHeartBeat += dataMap.getStringArrayList(BUFFERDATA_PATH).size();
+                countHeartBeat += dataMap.getStringArrayList(Flags.BUFFERDATA_PATH).size();
                 Log.i(TAG, "buffer data received" + countHeartBeat);
                 Toast.makeText(this, String.valueOf(countHeartBeat), Toast.LENGTH_LONG).show();
-                saveFile(dataMap.getStringArrayList(BUFFERDATA_PATH));
+                saveFile(dataMap.getStringArrayList(Flags.BUFFERDATA_PATH));
 
 
                 /////////////////send data to server
                 try {
-                    sendData("fengling_2000@yahoo.com", dataMap.getStringArrayList(BUFFERDATA_PATH));
+                    sendData("fengling_2000@yahoo.com", dataMap.getStringArrayList(Flags.BUFFERDATA_PATH));
                 }catch(Exception e){
                     Log.e(TAG, "error sending data", e);
                 }
@@ -118,57 +116,10 @@ public class phoneWearableListenerService extends WearableListenerService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //String path3 = getFilesDir().getAbsolutePath() + "/"+file.getName();
-        //File f3 = new File(path3);
-        //file.setReadable(true,false);
-
-        //copy the file to public directory
-        //String sourcePath = getFilesDir().getAbsolutePath();
-        //String destinationPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-        //copyFile(String.valueOf(sourcePath),"/test.txt",String.valueOf(destinationPath));
-    }
-
-    /*
-    //copy file
-    private void copyFile(String inputPath, String inputFile, String outputPath) {
-
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-
-            //create output directory if it doesn't exist
-            File dir = new File (outputPath);
-            if (!dir.exists())
-            {
-                dir.mkdirs();
-            }
-
-
-            in = new FileInputStream(inputPath + inputFile);
-            out = new FileOutputStream(outputPath + inputFile);
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-            in = null;
-
-            // write the output file (You have now copied the file)
-            out.flush();
-            out.close();
-            out = null;
-
-        }  catch (FileNotFoundException fnfe1) {
-            Log.e("tag", fnfe1.getMessage());
-        }
-        catch (Exception e) {
-            Log.e("tag", e.getMessage());
-        }
 
     }
-    */
+
+
 
     public void sendData(String username, List<String> dataList) {
 

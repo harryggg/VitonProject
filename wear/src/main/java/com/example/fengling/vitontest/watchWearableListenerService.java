@@ -34,10 +34,7 @@ public class watchWearableListenerService extends WearableListenerService{
 
     private GoogleApiClient mGoogleApiClient;
     private final String TAG = "watch service";
-    private static final String BUFFERDATA_PATH = "/viton/bufferData";
-    private static final String START_ACTIVITY_PATH_START = "/viton/start";
-    private static final String START_ACTIVITY_PATH_STOP = "/viton/stop";
-    private static final String START_ACTIVITY_PATH_GETDATA = "/viton/getData";
+
 
 
     @Override
@@ -49,14 +46,14 @@ public class watchWearableListenerService extends WearableListenerService{
 
 
 
-        if (s.equals(START_ACTIVITY_PATH_START)) {
+        if (s.equals(Flags.START_ACTIVITY_PATH_START)) {
             startService(new Intent(this, MyService.class));
             Log.i(TAG, "measurement started");
 
-        } else if (s.equals(START_ACTIVITY_PATH_STOP)) {
+        } else if (s.equals(Flags.START_ACTIVITY_PATH_STOP)) {
             stopService(new Intent(this, MyService.class));
             Log.i(TAG, "measurement stopped");
-        }else if(s.equals(START_ACTIVITY_PATH_GETDATA)){
+        }else if(s.equals(Flags.START_ACTIVITY_PATH_GETDATA)){
             Log.i(TAG,"prepare to send file to phone");
             sendFile();
         } else {
@@ -149,8 +146,8 @@ public class watchWearableListenerService extends WearableListenerService{
                 protected Boolean doInBackground(Void... params) {
 
                     //send buffer data to phone
-                    PutDataMapRequest dataMap = PutDataMapRequest.create(BUFFERDATA_PATH);
-                    dataMap.getDataMap().putStringArrayList(BUFFERDATA_PATH, dataToPhone);
+                    PutDataMapRequest dataMap = PutDataMapRequest.create(Flags.BUFFERDATA_PATH);
+                    dataMap.getDataMap().putStringArrayList(Flags.BUFFERDATA_PATH, dataToPhone);
                     PutDataRequest request = dataMap.asPutDataRequest();
                     PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, request);
                     pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {

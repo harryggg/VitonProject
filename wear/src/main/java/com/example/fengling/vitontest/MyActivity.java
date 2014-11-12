@@ -26,7 +26,7 @@ import java.util.Calendar;
 public class MyActivity extends Activity {
 
     private final String TAG = "watch main";
-    private static final String START_ACTIVITY_PATH = "/viton/start";
+
     private GoogleApiClient mGoogleApiClient;
     public static Handler mUiHandler = null;
     private TextView mTextView;
