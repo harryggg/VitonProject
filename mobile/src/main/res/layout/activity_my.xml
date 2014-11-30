@@ -32,15 +32,15 @@
         android:onClick="sendMessageToGetDataFromWatch"
         android:layout_toEndOf="@+id/textView"
         android:layout_marginTop="56dp"
-        android:layout_below="@+id/button"
+        android:layout_below="@+id/bDisconnect"
         android:layout_alignEnd="@+id/start_Measurement"
-        android:layout_alignStart="@+id/button" />
+        android:layout_alignStart="@+id/bDisconnect" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop Measuring"
-        android:id="@+id/button"
+        android:id="@+id/bDisconnect"
         android:onClick="sendMessageToStopService"
         android:layout_toEndOf="@+id/textView"
         android:layout_centerVertical="true"
