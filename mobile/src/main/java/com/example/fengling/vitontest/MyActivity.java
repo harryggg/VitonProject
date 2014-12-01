@@ -117,6 +117,12 @@ public class MyActivity extends Activity implements
     public void startBLE(View v){
         startActivity(new Intent(this,DeviceScanActivity.class));
     }
+
+    public void disconnectBLE(View v){
+        Intent intent = new Intent(this,DeviceControlService.class);
+        intent.setAction("TERMINATION");
+        startService(intent);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeviceControlService extends Service {
-    private final static String TAG = DeviceControlActivity.class.getSimpleName();
+    private final static String TAG = DeviceControlService.class.getSimpleName();
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
@@ -80,7 +80,7 @@ public class DeviceControlService extends Service {
                 mConnected = false;
 
                 // invalidateOptionsMenu();
-                clearUI();
+
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 if(findHeartServices(mBluetoothLeService.getSupportedGattServices())==false){
@@ -98,19 +98,22 @@ public class DeviceControlService extends Service {
     // list of supported characteristic features.
 
 
-    private void clearUI() {
 
-        mDataField.setText(R.string.no_data);
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG,"started");
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        if(intent.getAction()=="TERMINATION"){
+            Log.i(TAG,"terminated");
+            stopSelf();
+        }else {
+            Log.i(TAG, "started");
+            mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+            mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+            Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+            bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -184,8 +187,13 @@ public class DeviceControlService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        Log.i(TAG,"disconnected");
         mBluetoothLeService.disconnect();
+
+        super.onDestroy();
+
+
+
     }
      @Override
     public IBinder onBind(Intent intent) {

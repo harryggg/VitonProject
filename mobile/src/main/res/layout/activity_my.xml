@@ -1,18 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MyActivity">
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:orientation="vertical" >
 
-    <TextView
-        android:text="@string/hello_world"
+
+    <Button
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView" />
+        android:text="BLE Measuring"
+        android:id="@+id/Start_BLE"
+        android:onClick="startBLE"
+
+       />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disconnect BLE"
+        android:id="@+id/bDisconnectBLE"
+        android:onClick="disconnectBLE"
+     />
+
 
     <Button
         android:layout_width="wrap_content"
@@ -20,21 +30,8 @@
         android:text="Start Android Wear Measuring"
         android:id="@+id/start_Measurement"
         android:onClick="sendMessageToStartService"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="126dp" />
+         />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Retrieve data"
-        android:id="@+id/retrieveData"
-        android:onClick="sendMessageToGetDataFromWatch"
-        android:layout_toEndOf="@+id/textView"
-        android:layout_marginTop="56dp"
-        android:layout_below="@+id/bDisconnect"
-        android:layout_alignEnd="@+id/start_Measurement"
-        android:layout_alignStart="@+id/bDisconnect" />
 
     <Button
         android:layout_width="wrap_content"
@@ -42,18 +39,9 @@
         android:text="Stop Measuring"
         android:id="@+id/bDisconnect"
         android:onClick="sendMessageToStopService"
-        android:layout_toEndOf="@+id/textView"
-        android:layout_centerVertical="true"
-        android:layout_alignStart="@+id/start_Measurement" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BLE Measuring"
-        android:id="@+id/Start_BLE"
-        android:onClick="startBLE"
-        android:layout_below="@+id/textView"
-        android:layout_alignStart="@+id/start_Measurement"
-        android:layout_marginTop="47dp" />
+         />
 
-</RelativeLayout>
+
+
+</LinearLayout>
