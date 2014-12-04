@@ -31,7 +31,8 @@ import java.util.concurrent.TimeUnit;
 public class DataTransferService extends Service {
     private static final String TAG = "DataTransferService";
     private GoogleApiClient mGoogleApiClient;
-
+    private static int attemptCount = 0;
+    private static int terminationCount = 0;
 
     private AlarmManager alarmMgr;
     @Override
@@ -121,13 +122,19 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else {
-            Log.i(TAG, "not connected,restart");
+            if (terminationCount>5){
+                Log.e(TAG,"tried 5 times to request,give up");
+                attemptCount = 0;
+            }else {
+                attemptCount++;
+                Log.i(TAG, "not connected,restart,attempts: "+attemptCount);
 
-            Context context = this.getApplicationContext();
+                Context context = this.getApplicationContext();
 
-            Intent myIntent1 = new Intent(context, DataTransferService.class);
-            myIntent1.setAction("REQUEST_DATA");
-            context.startService(myIntent1);
+                Intent myIntent1 = new Intent(context, DataTransferService.class);
+                myIntent1.setAction("REQUEST_DATA");
+                context.startService(myIntent1);
+            }
         }
         //saveFile();
     }
@@ -156,13 +163,19 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else {
-            Log.i(TAG, "not connected,restarting");
+            if (terminationCount>5){
+                Log.e(TAG,"tried 5 times to terminate,give up");
+                terminationCount = 0;
+            }else {
+                terminationCount++;
+                Log.i(TAG, "not connected,restart,attempts: "+terminationCount);
 
-            Context context = this.getApplicationContext();
+                Context context = this.getApplicationContext();
 
-            Intent myIntent1 = new Intent(context, DataTransferService.class);
-            myIntent1.setAction("TERMINATION");
-            context.startService(myIntent1);
+                Intent myIntent1 = new Intent(context, DataTransferService.class);
+                myIntent1.setAction("REQUEST_DATA");
+                context.startService(myIntent1);
+            }
         }
         //saveFile();
     }
@@ -188,11 +201,17 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else{
-            Log.e(TAG, "not connected,restarting");
-            Context context = this.getApplicationContext();
+            if (attemptCount>5){
+                Log.e(TAG,"attempted 5 times, give up");
+                attemptCount = 0;
+            }else {
+                attemptCount++;
+                Log.e(TAG, "not connected,restarting,attempt: "+attemptCount);
+                Context context = this.getApplicationContext();
 
-            Intent myIntent1 = new Intent(context, DataTransferService.class);
-            context.startService(myIntent1);
+                Intent myIntent1 = new Intent(context, DataTransferService.class);
+                context.startService(myIntent1);
+            }
 
         }
         //saveFile();
