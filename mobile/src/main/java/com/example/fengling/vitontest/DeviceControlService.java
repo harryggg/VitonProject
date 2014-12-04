@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,6 +105,7 @@ public class DeviceControlService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction()=="TERMINATION"){
             Log.i(TAG,"terminated");
+            unregisterReceiver(mGattUpdateReceiver);
             stopSelf();
         }else {
             Log.i(TAG, "started");
@@ -149,6 +151,12 @@ public class DeviceControlService extends Service {
                 if (UUID_HEART_RATE_MEASUREMENT.equals(gattCharacteristic.getUuid())) {
                     mCharacteristic = gattCharacteristic;
                     Log.i(TAG,"Found!"+mCharacteristic.toString());
+                    Context context = getApplicationContext();
+                    CharSequence text = "device connected!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
                     foundChara = true;
                     final int charaProp = mCharacteristic.getProperties();
                     if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
