@@ -3,6 +3,7 @@ package com.example.fengling.vitontest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -122,6 +123,11 @@ public class MyActivity extends Activity implements
         Intent intent = new Intent(this,DeviceControlService.class);
         intent.setAction("TERMINATION");
         startService(intent);
+    }
+
+    public void resetBLE(View v){
+        SharedPreferences settings = getSharedPreferences("setting", 0);
+        settings.edit().clear().commit();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

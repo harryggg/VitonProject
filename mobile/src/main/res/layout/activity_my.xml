@@ -22,7 +22,13 @@
         android:id="@+id/bDisconnectBLE"
         android:onClick="disconnectBLE"
      />
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="reset BLE"
+        android:id="@+id/bresetBLE"
+        android:onClick="resetBLE"
+        />
 
     <Button
         android:layout_width="wrap_content"

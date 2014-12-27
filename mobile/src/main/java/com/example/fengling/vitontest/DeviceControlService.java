@@ -105,7 +105,7 @@ public class DeviceControlService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction()=="TERMINATION"){
             Log.i(TAG,"terminated");
-            unregisterReceiver(mGattUpdateReceiver);
+ //           unregisterReceiver(mGattUpdateReceiver);
             stopSelf();
         }else {
             Log.i(TAG, "started");
@@ -196,7 +196,7 @@ public class DeviceControlService extends Service {
     @Override
     public void onDestroy() {
         Log.i(TAG,"disconnected");
-        mBluetoothLeService.disconnect();
+   //     mBluetoothLeService.disconnect();
 
         super.onDestroy();
 

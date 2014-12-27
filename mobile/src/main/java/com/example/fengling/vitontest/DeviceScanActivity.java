@@ -23,9 +23,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +45,8 @@ import java.util.ArrayList;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
+    private static final String TAG = "DeviceScanActivity";
+
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -127,6 +131,9 @@ public class DeviceScanActivity extends ListActivity {
         mLeDeviceListAdapter = new LeDeviceListAdapter();
         setListAdapter(mLeDeviceListAdapter);
         scanLeDevice(true);
+        BluetoothDevice device;
+        Log.i(TAG,"initialize device list");
+
     }
 
     @Override
@@ -153,6 +160,11 @@ public class DeviceScanActivity extends ListActivity {
         final Intent intent =  new Intent(this, DeviceControlService.class);
         intent.putExtra(DeviceControlService.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(DeviceControlService.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        SharedPreferences settings = getSharedPreferences("setting",0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("LeDeviceAddress",device.getAddress());
+        editor.commit();
+        Log.i(TAG,settings.getString("LeDeviceAddress","null"));
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;
@@ -221,10 +233,22 @@ public class DeviceScanActivity extends ListActivity {
             return i;
         }
 
+        public BluetoothDevice getDeviceByAddress(String address){
+
+            for (BluetoothDevice device:mLeDevices){
+                Log.i("getDeviceByAdd",device.getAddress());
+                if (device.getAddress().equals(address)){
+                    return device;
+                }
+            }
+            return null;
+        }
+
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             ViewHolder viewHolder;
             // General ListView optimization code.
+
             if (view == null) {
                 view = mInflator.inflate(R.layout.listitem_device, null);
                 viewHolder = new ViewHolder();
@@ -256,6 +280,27 @@ public class DeviceScanActivity extends ListActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    SharedPreferences settings = getSharedPreferences("setting",0);
+                    String lastDeviceAddress = settings.getString("LeDeviceAddress","null");
+                    if (!lastDeviceAddress.equals("null")){
+                        Log.i(TAG,"previous address found:"+lastDeviceAddress);
+                        Log.i(TAG,device.getAddress());
+                        if (device.getAddress().equals(lastDeviceAddress)) {
+                            Log.i(TAG,"previous device found");
+                            CharSequence text = "auto-connected!";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+                            toast.show();
+                            Intent intent = new Intent(DeviceScanActivity.this,DeviceControlService.class);
+                            intent.putExtra(DeviceControlService.EXTRAS_DEVICE_NAME, device.getName());
+                            intent.putExtra(DeviceControlService.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                            if (mScanning) {
+                                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                                mScanning = false;
+                            }
+                            startService(intent);
+                        }
+                    }
                     mLeDeviceListAdapter.addDevice(device);
                     mLeDeviceListAdapter.notifyDataSetChanged();
                 }

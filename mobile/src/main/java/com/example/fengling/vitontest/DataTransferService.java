@@ -67,8 +67,10 @@ public class DataTransferService extends Service {
         Log.i(TAG,"onStartCommand");
         if (intent.getAction()=="TERMINATION"){ //action to terminate the service
             Log.i(TAG,"TERMINATION");
+            sendMessageToGetDataFromWatch(); //get the remaining data
             sendMessageToStopService();
             setNextAlarm(0);
+
             //scheduleTaskExecutor.shutdownNow();
             stopSelf();
         }else if(intent.getAction()=="REQUEST_DATA"){ //action to send message to request data
