@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class DataTransferService extends Service {
     private static final String TAG = "DataTransferService";
     private GoogleApiClient mGoogleApiClient;
+    private static int startAttemptCount = 0;
     private static int attemptCount = 0;
     private static int terminationCount = 0;
 
@@ -124,10 +125,16 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else {
-            if (terminationCount>5){
+            Log.i(TAG,"attempt:"+attemptCount);
+            if (attemptCount>5){
                 Log.e(TAG,"tried 5 times to request,give up");
                 attemptCount = 0;
             }else {
+                try {
+                    Thread.sleep(((int) (1000 * Math.pow(2, attemptCount))));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 attemptCount++;
                 Log.i(TAG, "not connected,restart,attempts: "+attemptCount);
 
@@ -165,10 +172,16 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else {
+            Log.i(TAG,"terminationcount:"+terminationCount);
             if (terminationCount>5){
                 Log.e(TAG,"tried 5 times to terminate,give up");
                 terminationCount = 0;
             }else {
+                try {
+                    Thread.sleep(((int) (1000 * Math.pow(2, terminationCount))));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 terminationCount++;
                 Log.i(TAG, "not connected,restart,attempts: "+terminationCount);
 
@@ -203,12 +216,18 @@ public class DataTransferService extends Service {
                 }
             }).start();
         }else{
-            if (attemptCount>5){
-                Log.e(TAG,"attempted 5 times, give up");
-                attemptCount = 0;
+            Log.i(TAG,"attemptstartcount:"+startAttemptCount);
+            if (startAttemptCount>5){
+                Log.e(TAG,"try to start for 5 times, give up");
+                startAttemptCount = 0;
             }else {
-                attemptCount++;
-                Log.e(TAG, "not connected,restarting,attempt: "+attemptCount);
+                try {
+                    Thread.sleep(((int) (1000 * Math.pow(2, startAttemptCount))));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                startAttemptCount++;
+                Log.e(TAG, "not connected,restarting,attempt: "+startAttemptCount);
                 Context context = this.getApplicationContext();
 
                 Intent myIntent1 = new Intent(context, DataTransferService.class);
