@@ -5,6 +5,7 @@ package com.example.fengling.vitontest;
  */
 public class Flags {
     public static final int UPDATEINTERVAL = 30*60*1000; //
+    public static final int MAXRETRY = 8;
     public static final String START_ACTIVITY_PATH_START = "/viton/start";
     public static final String START_ACTIVITY_PATH_STOP = "/viton/stop";
     public static final String START_ACTIVITY_PATH_GETDATA = "/viton/getData";

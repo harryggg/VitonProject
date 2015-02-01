@@ -396,7 +396,7 @@ public class BluetoothLeService extends Service {
         String filename = sdf.format(new Date());
 
         //Log.i(TAG,Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/viton/" + fDate);
-        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/vitonBLE/" + fDate);
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/vitonBLE/" + "BLE_"+fDate);
         if (!folder.exists()){
             folder.mkdirs();
             Log.i(TAG,"folder is in place");

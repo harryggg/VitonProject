@@ -126,7 +126,7 @@ public class DataTransferService extends Service {
             }).start();
         }else {
             Log.i(TAG,"attempt:"+attemptCount);
-            if (attemptCount>5){
+            if (attemptCount> Flags.MAXRETRY){
                 Log.e(TAG,"tried 5 times to request,give up");
                 attemptCount = 0;
             }else {
@@ -173,7 +173,7 @@ public class DataTransferService extends Service {
             }).start();
         }else {
             Log.i(TAG,"terminationcount:"+terminationCount);
-            if (terminationCount>5){
+            if (terminationCount>Flags.MAXRETRY){
                 Log.e(TAG,"tried 5 times to terminate,give up");
                 terminationCount = 0;
             }else {
@@ -217,7 +217,7 @@ public class DataTransferService extends Service {
             }).start();
         }else{
             Log.i(TAG,"attemptstartcount:"+startAttemptCount);
-            if (startAttemptCount>5){
+            if (startAttemptCount>Flags.MAXRETRY){
                 Log.e(TAG,"try to start for 5 times, give up");
                 startAttemptCount = 0;
             }else {
